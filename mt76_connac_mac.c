@@ -731,16 +731,19 @@ bool mt76_connac2_mac_add_txs_skb(struct mt76_dev *dev, struct mt76_wcid *wcid,
 	skb = mt76_tx_status_skb_get(dev, wcid, pid, &list);
 	if (skb) {
 		struct ieee80211_tx_info *info = IEEE80211_SKB_CB(skb);
-		bool noacked = !(info->flags & IEEE80211_TX_STAT_ACK);
+		bool noacked;
 
 		if (!(le32_to_cpu(txs_data[0]) & MT_TXS0_ACK_ERROR_MASK))
 			info->flags |= IEEE80211_TX_STAT_ACK;
 
+		noacked = !(info->flags & IEEE80211_TX_STAT_ACK);
 		info->status.ampdu_len = 1;
 		info->status.ampdu_ack_len = !noacked;
 		info->status.rates[0].idx = -1;
 
-		wcid->stats.tx_failed += noacked;
+		/* avoid double counting if dev supports txfree event */
+		if (is_mt7921(dev))
+			wcid->stats.tx_failed += noacked;
 
 		mt76_connac2_mac_fill_txs(dev, wcid, txs_data);
 		mt76_tx_status_skb_done(dev, skb, &list);
