@@ -523,7 +523,6 @@ void mt76_connac2_mac_write_txwi(struct mt76_dev *dev, __le32 *txwi,
 			mt76_connac_lmac_mapping(skb_get_queue_mapping(skb));
 
 		/* counting non-offloading skbs */
-		wcid->stats.tx_bytes += skb->len;
 		wcid->stats.tx_packets++;
 	}
 
