@@ -1574,6 +1574,8 @@ void mt7915_mac_reset_work(struct work_struct *work)
 	if (!(READ_ONCE(dev->recovery.state) & MT_MCU_CMD_STOP_DMA))
 		return;
 
+	dev_info(dev->mt76.dev,"%s L1 SER recovery start.\n",
+		 wiphy_name(dev->mt76.hw->wiphy));
 	if (mtk_wed_device_active(&dev->mt76.mmio.wed)) {
 		mtk_wed_device_stop(&dev->mt76.mmio.wed);
 		if (!is_mt798x(&dev->mt76))
@@ -1611,6 +1613,12 @@ void mt7915_mac_reset_work(struct work_struct *work)
 		mt7915_wait_reset_state(dev, MT_MCU_CMD_RECOVERY_DONE);
 	}
 
+	mt76_wr(dev, MT_MCU_INT_EVENT, MT_MCU_INT_EVENT_RESET_DONE);
+	mt7915_wait_reset_state(dev, MT_MCU_CMD_NORMAL_STATE);
+
+	/* enable dma tx/rx and interrupt */
+	__mt7915_dma_enable(dev, false, false);
+
 	clear_bit(MT76_MCU_RESET, &dev->mphy.state);
 	clear_bit(MT76_RESET, &dev->mphy.state);
 	if (phy2)
@@ -1624,9 +1632,6 @@ void mt7915_mac_reset_work(struct work_struct *work)
 	local_bh_enable();
 
 	tasklet_schedule(&dev->mt76.irq_tasklet);
-
-	mt76_wr(dev, MT_MCU_INT_EVENT, MT_MCU_INT_EVENT_RESET_DONE);
-	mt7915_wait_reset_state(dev, MT_MCU_CMD_NORMAL_STATE);
 
 	mt76_worker_enable(&dev->mt76.tx_worker);
 
@@ -1649,6 +1654,8 @@ void mt7915_mac_reset_work(struct work_struct *work)
 		ieee80211_queue_delayed_work(ext_phy->hw,
 					     &phy2->mt76->mac_work,
 					     MT7915_WATCHDOG_TIME);
+	dev_info(dev->mt76.dev,"%s L1 SER recovery completed.\n",
+		 wiphy_name(dev->mt76.hw->wiphy));
 }
 
 /* firmware coredump */
@@ -1723,6 +1730,10 @@ skip_coredump:
 
 void mt7915_reset(struct mt7915_dev *dev)
 {
+	dev_info(dev->mt76.dev, "%s SER recovery state: 0x%08x\n",
+		 wiphy_name(dev->mt76.hw->wiphy),
+		 READ_ONCE(dev->recovery.state));
+
 	if (!dev->recovery.hw_init_done)
 		return;
 
