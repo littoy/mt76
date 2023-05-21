@@ -1389,8 +1389,12 @@ mt7915_mac_restart(struct mt7915_dev *dev)
 
 	if (dev_is_pci(mdev->dev)) {
 		mt76_wr(dev, MT_PCIE_MAC_INT_ENABLE, 0x0);
-		if (dev->hif2)
-			mt76_wr(dev, MT_PCIE1_MAC_INT_ENABLE, 0x0);
+		if (dev->hif2) {
+			if (is_mt7915(mdev))
+				mt76_wr(dev, MT_PCIE1_MAC_INT_ENABLE, 0x0);
+			else
+				mt76_wr(dev, MT_PCIE1_MAC_INT_ENABLE_MT7916, 0x0);
+		}
 	}
 
 	set_bit(MT76_RESET, &dev->mphy.state);
@@ -1440,8 +1444,12 @@ mt7915_mac_restart(struct mt7915_dev *dev)
 	}
 	if (dev_is_pci(mdev->dev)) {
 		mt76_wr(dev, MT_PCIE_MAC_INT_ENABLE, 0xff);
-		if (dev->hif2)
-			mt76_wr(dev, MT_PCIE1_MAC_INT_ENABLE, 0xff);
+		if (dev->hif2) {
+			if (is_mt7915(mdev))
+				mt76_wr(dev, MT_PCIE1_MAC_INT_ENABLE, 0xff);
+			else
+				mt76_wr(dev, MT_PCIE1_MAC_INT_ENABLE_MT7916, 0xff);
+		}
 	}
 
 	/* load firmware */
