@@ -107,6 +107,7 @@ static int mt7915_pci_probe(struct pci_dev *pdev,
 	struct mt76_dev *mdev;
 	int irq;
 	int ret;
+	u16 cmd;
 
 	ret = pcim_enable_device(pdev);
 	if (ret)
@@ -116,6 +117,11 @@ static int mt7915_pci_probe(struct pci_dev *pdev,
 	if (ret)
 		return ret;
 
+	pci_read_config_word(pdev, PCI_COMMAND, &cmd);
+	if (!(cmd & PCI_COMMAND_MEMORY)) {
+		cmd |= PCI_COMMAND_MEMORY;
+		pci_write_config_word(pdev, PCI_COMMAND, cmd);
+	}
 	pci_set_master(pdev);
 
 	ret = dma_set_mask(&pdev->dev, DMA_BIT_MASK(32));
