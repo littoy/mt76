@@ -2890,7 +2890,7 @@ int mt7915_mcu_apply_group_cal(struct mt7915_dev *dev)
 	u8 idx = 0, *cal = dev->cal, *eep = dev->mt76.eeprom.data;
 	u32 total = MT_EE_CAL_GROUP_SIZE;
 
-	if (1 || !(eep[MT_EE_DO_PRE_CAL] & MT_EE_WIFI_CAL_GROUP))
+	if (!(eep[MT_EE_DO_PRE_CAL] & MT_EE_WIFI_CAL_GROUP))
 		return 0;
 
 	/*
@@ -2974,7 +2974,7 @@ int mt7915_mcu_apply_tx_dpd(struct mt7915_phy *phy)
 	u8 *cal = dev->cal, *eep = dev->mt76.eeprom.data;
 	int idx;
 
-	if (1 || !(eep[MT_EE_DO_PRE_CAL] & MT_EE_WIFI_CAL_DPD))
+	if (!(eep[MT_EE_DO_PRE_CAL] & MT_EE_WIFI_CAL_DPD))
 		return 0;
 
 	idx = mt7915_dpd_freq_idx(center_freq, chandef->width);
