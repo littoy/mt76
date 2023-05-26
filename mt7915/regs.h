@@ -310,6 +310,9 @@ enum offs_rev {
 #define MT_MIB_SDR3_FCS_ERR_MASK	GENMASK(15, 0)
 #define MT_MIB_SDR3_FCS_ERR_MASK_MT7916	GENMASK(31, 16)
 
+#define MT_MIB_SDR9(_band)		MT_WF_MIB(_band, 0x02c)
+#define MT_MIB_SDR9_BUSY_MASK		GENMASK(23, 0)
+
 #define MT_MIB_SDR4(_band)		MT_WF_MIB(_band, __OFFS(MIB_SDR4))
 #define MT_MIB_SDR4_RX_FIFO_FULL_MASK	GENMASK(15, 0)
 
@@ -415,6 +418,10 @@ enum offs_rev {
 #define MT_MIB_MU_BF_TX_CNT		GENMASK(15, 0)
 
 /* 36, 37 both DNR */
+#define MT_MIB_SDR36(_band)		MT_WF_MIB(_band, 0x098)
+#define MT_MIB_SDR36_TXTIME_MASK	GENMASK(23, 0)
+#define MT_MIB_SDR37(_band)		MT_WF_MIB(_band, 0x09c)
+#define MT_MIB_SDR37_RXTIME_MASK	GENMASK(23, 0)
 
 #define MT_MIB_DR8(_band)		MT_WF_MIB(_band, __OFFS(MIB_DR8))
 #define MT_MIB_DR9(_band)		MT_WF_MIB(_band, __OFFS(MIB_DR9))
@@ -555,6 +562,7 @@ enum offs_rev {
 #define MT_WF_RMAC_RSVD0(_band)	MT_WF_RMAC(_band, 0x02e0)
 #define MT_WF_RMAC_RSVD0_EIFS_CLR	BIT(21)
 
+#define MT_WF_RMAC_MIB_TIME0(_band)	MT_WF_RMAC(_band, 0x03c4)
 #define MT_WF_RMAC_MIB_AIRTIME0(_band)	MT_WF_RMAC(_band, 0x0380)
 #define MT_WF_RMAC_MIB_RXTIME_CLR	BIT(31)
 #define MT_WF_RMAC_MIB_OBSS_BACKOFF	GENMASK(15, 0)
@@ -568,6 +576,10 @@ enum offs_rev {
 
 #define MT_WF_RMAC_MIB_AIRTIME4(_band)	MT_WF_RMAC(_band, 0x0390)
 #define MT_WF_RMAC_MIB_QOS23_BACKOFF	GENMASK(31, 0)
+
+#define MT_WF_RMAC_MIB_AIRTIME14(_band)	MT_WF_RMAC(_band, 0x03b8)
+#define MT_MIB_OBSSTIME_MASK		GENMASK(23, 0)
+#define MT_WF_RMAC_MIB_AIRTIME0(_band)	MT_WF_RMAC(_band, 0x0380)
 
 /* WFDMA0 */
 #define MT_WFDMA0_BASE			__REG(WFDMA0_ADDR)
