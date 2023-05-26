@@ -886,6 +886,7 @@ mt7915_txwi_free(struct mt7915_dev *dev, struct mt76_txwi_cache *t,
 		wcid_idx = wcid->idx;
 	} else {
 		wcid_idx = le32_get_bits(txwi[1], MT_TXD1_WLAN_IDX);
+		rcu_read_lock();
 		wcid = rcu_dereference(dev->mt76.wcid[wcid_idx]);
 
 		if (wcid && wcid->sta) {
@@ -897,6 +898,7 @@ mt7915_txwi_free(struct mt7915_dev *dev, struct mt76_txwi_cache *t,
 				list_add_tail(&msta->poll_list, &dev->sta_poll_list);
 			spin_unlock_bh(&dev->sta_poll_lock);
 		}
+		rcu_read_unlock();
 	}
 
 	if (sta && likely(t->skb->protocol != cpu_to_be16(ETH_P_PAE)))
