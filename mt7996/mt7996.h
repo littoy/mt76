@@ -104,8 +104,6 @@ struct mt7996_sta {
 	unsigned long changed;
 	unsigned long jiffies;
 
-	struct mt76_sta_stats stats;
-
 	struct mt76_connac_sta_key_conf bip;
 
 	struct {
