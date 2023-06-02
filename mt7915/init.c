@@ -434,6 +434,11 @@ mt7915_init_wiphy(struct mt7915_phy *phy)
 			vht_cap->cap |=
 				IEEE80211_VHT_CAP_MAX_MPDU_LENGTH_7991 |
 				IEEE80211_VHT_CAP_MAX_A_MPDU_LENGTH_EXPONENT_MASK;
+
+			if (!dev->dbdc_support)
+				vht_cap->cap |=
+					IEEE80211_VHT_CAP_SHORT_GI_160 |
+					FIELD_PREP(IEEE80211_VHT_CAP_EXT_NSS_BW_MASK, 1);
 		} else {
 			phy->mt76->sband_5g.sband.ht_cap.ampdu_density =
 				IEEE80211_HT_MPDU_DENSITY_2;
@@ -884,9 +889,12 @@ mt7915_set_stream_he_txbf_caps(struct mt7915_phy *phy,
 	int sts = hweight8(phy->mt76->chainmask);
 	u8 c, sts_160 = sts;
 
-	/* mt7915 doesn't support bw160 */
+	/* Can do 1/2 of STS in 160Mhz mode for mt7915 */
 	if (is_mt7915(&dev->mt76)) {
-		sts_160 = 0;
+		if (!dev->dbdc_support)
+			sts_160 /= 2;
+		else
+			sts_160 = 0;
 	}
 
 #ifdef CONFIG_MAC80211_MESH
@@ -967,10 +975,15 @@ mt7915_init_he_caps(struct mt7915_phy *phy, enum nl80211_band band,
 	int i, idx = 0, nss = hweight8(phy->mt76->antenna_mask);
 	u16 mcs_map = 0;
 	u16 mcs_map_160 = 0;
-	u8 nss_160 = nss;
+	u8 nss_160;
 
-	/* Can't do 160MHz with mt7915 */
-	if (is_mt7915(&dev->mt76))
+	if (!is_mt7915(&dev->mt76))
+		nss_160 = nss;
+	else if (!dev->dbdc_support)
+		/* Can do 1/2 of NSS streams in 160Mhz mode for mt7915 */
+		nss_160 = nss / 2;
+	else
+		/* Can't do 160MHz with mt7915 dbdc */
 		nss_160 = 0;
 
 	for (i = 0; i < 8; i++) {
